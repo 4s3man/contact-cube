@@ -1,0 +1,199 @@
+.e{
+  background: #02000c;
+  color:white;
+  overflow: hidden;
+}
+button,input,.dono{
+  background: none;
+  text-align: center;
+  margin:5px 5px !important;
+}
+.center{
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top:200px;
+}
+.cont{
+  position:relative;
+  margin:0 auto;
+  perspective: 1000px;
+  width:300px;
+  height:300px;
+}
+.cube{
+    position: absolute;
+    width: 100%;
+    height:100%;
+    transform-style: preserve-3d;;
+    transition: 0.5s transform linear;
+
+}
+.cube > div{
+  position: absolute;
+  display: flex;
+  flex-flow:row wrap;
+  width: 100%;
+  height:100%;
+  box-sizing: border-box;
+  background-color:transparent;
+  border:2px solid white;
+  border-radius: 10px;
+  backface-visibility: hidden;
+}
+.cube .front{
+  transform: rotateX(0deg) translateZ(145px);
+}
+.cube .back{
+  transform: rotateX(180deg) translateZ(145px);
+}
+.cube .left{
+  transform: rotateY(-90deg) translateZ(145px);
+}
+.cube .right{
+  transform: rotateY(90deg) translateZ(145px);
+}
+.cube .top{
+  transform: rotateX(90deg) translateZ(145px);
+}
+.cube .bottom{
+  transform: rotateX(-90deg) translateZ(145px);
+}
+.wall .inner-cube{
+  width: 86px;
+  height:86px;
+  display: flex;
+  justify-content: center;;
+  align-items: center;
+}
+.wall{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.header{
+  position: absolute;
+  top: 60px;
+  margin: 0 auto;
+  text-align: center;
+}
+.selected{
+  border:0px solid green !important;
+  border-radius: 50px;
+  box-shadow: 0px 0px 15px green;
+  box-sizing: border-box;
+}
+.settings{
+  top:70px;
+  left:30px;
+  width:450px;
+  height:550px;
+  display: flex;
+  flex-flow:row wrap;
+}
+.r{
+  right:30px;
+  left:unset !important;
+}
+.ustaw{
+  display: flex;
+  flex-flow:column nowrap;
+  align-items: center;
+}
+.jumbotron{
+  padding-top: 0 !important;
+  background-color:transparent !important;
+  overflow: hidden;
+  height: 100vh;
+}
+.btn{
+  border:2px solid green;
+  box-shadow: 0px 0px 10px green;
+}
+button,.m{
+  border-radius: 8px;
+  border:2px solid transparent;
+  transition:1s border;
+}
+button:hover,.m:hover{
+  border:2px solid green;
+  box-shadow: 0px 0px 10px green;
+}
+h2,h3{
+  min-height: 40px !important;
+}
+.next,.disp{
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: center;
+}
+.disp{
+  align-items:flex-start;
+}
+.show-front{
+  transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+}
+.show-right{
+  transform: rotateX(0deg) rotateY(-90deg) rotateZ(0deg);
+}
+.show-left{
+  transform: rotateX(0deg) rotateY(90deg) rotateZ(0deg);
+}
+.show-top{
+  transform: rotateX(-90deg) rotateY(0deg) rotateZ(0deg);
+}
+.show-bottom{
+  transform: rotateX(90deg) rotateY(0deg) rotateZ(0deg);
+}
+.show-back{
+  transform: rotateX(-180deg) rotateY(0deg) rotateZ(0);
+}
+#area{
+  display: flex;
+  flex-flow: column nowrap;
+}
+.move-err-up{
+  animation:moveErrUp 0.5s linear 1;
+}
+.move-err-down{
+  animation:moveErrDown 0.5s linear 1;
+}
+.move-err-left{
+  animation:moveErrLeft 0.5s linear 1;
+}
+.move-err-right{
+  animation:moveErrRight 0.5s linear 1;
+}
+@keyframes moveErrUp {
+  50%{
+    box-shadow:inset 0px 10px 9px red;
+  }
+  100%{
+    box-shadow:inset 0px 0px 0px red;
+  }
+}
+@keyframes moveErrDown {
+  50%{
+    box-shadow:inset 0px -10px 9px red;
+  }
+  100%{
+    box-shadow:inset 0px 0px 0px red;
+  }
+}
+@keyframes moveErrLeft {
+  50%{
+    box-shadow:inset 10px 0px 9px red;
+  }
+  100%{
+    box-shadow:inset 0px 0px 0px red;
+  }
+}
+@keyframes moveErrRight {
+  50%{
+    box-shadow:inset -10px 0px 9px red;
+  }
+  100%{
+    box-shadow:inset 0px 0px 0px red;
+  }
+}

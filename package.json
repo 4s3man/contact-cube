@@ -1,0 +1,13 @@
+{
+  "name": "Database_project",
+  "version": "0.0.1",
+  "description": "projekt na bazy danych",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "express-session": "^1.15.6",
+    "mime": "latest",
+    "mime-types": "^2.1.17",
+    "mysql": "latest"
+  }
+}
