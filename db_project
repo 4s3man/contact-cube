@@ -1,0 +1,201 @@
+-- phpMyAdmin SQL Dump
+-- version 4.6.4
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Czas generowania: 17 Sty 2018, 16:22
+-- Wersja serwera: 5.7.14
+-- Wersja PHP: 5.6.25
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Baza danych: `db_project`
+--
+
+DELIMITER $$
+--
+-- Procedury
+--
+CREATE DEFINER=`admin`@`localhost` PROCEDURE `delete_osoba_uzyte_pola` (IN `x` INT(3), IN `y` INT(3), IN `sciana` VARCHAR(45))  begin
+set @nazwa_pola=(SELECT nazwa_pola from uzyte_pola where pole_x=x and pole_y=y and sciana_nazwa=sciana);
+delete from osoba where nazwa_pola=@nazwa_pola;
+delete from uzyte_pola where nazwa_pola=@nazwa_pola;
+end$$
+
+CREATE DEFINER=`admin`@`localhost` PROCEDURE `nazwaStronaPole` (IN `x` INT(3), IN `y` INT(3), IN `sciana` VARCHAR(45))  begin 
+    if exists (SELECT nazwa_pola from uzyte_pola where pole_x = x and pole_y=y and sciana_nazwa = sciana) then
+        SELECT (SELECT nazwa_pola from uzyte_pola where pole_x = x and pole_y=y and sciana_nazwa = sciana) as nazwaPola, naglowek
+from kostka where sciana_nazwa=sciana;
+    else 
+        SELECT naglowek,"puste" as nazwaPola from kostka as k WHERE k.sciana_nazwa=sciana ;
+    end if;
+END$$
+
+CREATE DEFINER=`admin`@`localhost` PROCEDURE `nazwaStronaPole1` (IN `x` INT(3), IN `y` INT(3), IN `sciana` VARCHAR(45))  begin 
+    if exists (SELECT nazwa_pola from uzyte_pola where pole_x = x and pole_y=y and sciana_nazwa = sciana) then
+        SELECT (SELECT nazwa_pola from uzyte_pola where pole_x = x and pole_y=y and sciana_nazwa = sciana) as nazwaPola, naglowek
+from kostka where sciana_nazwa=sciana;
+    else 
+        SELECT naglowek,"puste" as nazwa_pola from kostka as k WHERE k.sciana_nazwa=sciana ;
+    end if;
+END$$
+
+CREATE DEFINER=`admin`@`localhost` PROCEDURE `nazwa_update_insert_error` (IN `x` INT(3), IN `y` INT(3), IN `side` VARCHAR(10), IN `nazwa` VARCHAR(45) CHARSET utf8)  begin 
+    if exists (select * from uzyte_pola where nazwa_pola=nazwa and (pole_x!=x or pole_y!=y or sciana_nazwa!=side)) then
+        SELECT "Podana nazwa już istnieje
+zmien poprzednią lub wybierz inną" as re;
+    else
+      if exists (select * from uzyte_pola where pole_x = x and pole_y = y and sciana_nazwa = side) then
+      UPDATE uzyte_pola SET nazwa_pola = nazwa where pole_x = x and pole_y = y and sciana_nazwa = side;
+      else 
+      INSERT INTO uzyte_pola (sciana_nazwa,pole_x,pole_y,nazwa_pola,utworzenie)
+      values (side,x,y,nazwa,(SELECT current_timestamp));
+      end if;
+      SELECT "" as re;
+    end if;
+END$$
+
+CREATE DEFINER=`admin`@`localhost` PROCEDURE `osoba_update_insert` (IN `x` INT(3), IN `y` INT(3), IN `side` VARCHAR(45), IN `imie` VARCHAR(45), IN `nazwisko` VARCHAR(45), IN `ur` DATETIME, IN `tel` VARCHAR(50), IN `email` VARCHAR(45))  begin 
+    if exists (select * from osoba where nazwa_pola=(SELECT nazwa_pola from uzyte_pola where pole_x=x and pole_y=y and sciana_nazwa=side)) then
+    UPDATE osoba as o SET o.imie = imie,o.nazwisko=nazwisko,o.urodzenie=ur,o.telefon=tel,o.email=email where nazwa_pola=(SELECT nazwa_pola from uzyte_pola where pole_x=x and pole_y=y and sciana_nazwa=side);
+    else 
+    INSERT INTO osoba (imie,nazwisko,urodzenie,telefon,email,nazwa_pola)
+    values (imie,nazwisko,ur,tel,email,(SELECT nazwa_pola from uzyte_pola where pole_x=x and pole_y=y and sciana_nazwa=side));
+    end if;
+END$$
+
+CREATE DEFINER=`admin`@`localhost` PROCEDURE `updateInsertUzytePola` (IN `x` INT(3), IN `y` INT(3), IN `side` VARCHAR(45), IN `nazwa` VARCHAR(45))  begin 
+    if exists (select * from uzyte_pola where pole_x = x and pole_y = y and sciana_nazwa = side) then
+    UPDATE uzyte_pola SET nazwa_pola = nazwa where pole_x = x and pole_y = y and sciana_nazwa = side;
+    else 
+    INSERT INTO uzyte_pola (sciana_nazwa,pole_x,pole_y,nazwa_pola,utworzenie)
+    values (side,x,y,nazwa,(SELECT current_timestamp));
+    end if;
+END$$
+
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla tabeli `kostka`
+--
+
+CREATE TABLE `kostka` (
+  `naglowek` text CHARACTER SET utf8,
+  `sciana_nazwa` varchar(45) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Zrzut danych tabeli `kostka`
+--
+
+INSERT INTO `kostka` (`naglowek`, `sciana_nazwa`) VALUES
+('najwazniejsze', 'front'),
+('na osce', 'back'),
+('rodzina', 'left'),
+('historyczni', 'right'),
+('gora', 'top'),
+('trzydziestka', 'bottom');
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla tabeli `osoba`
+--
+
+CREATE TABLE `osoba` (
+  `imie` text CHARACTER SET utf8,
+  `nazwisko` text CHARACTER SET utf8,
+  `urodzenie` datetime DEFAULT NULL,
+  `telefon` varchar(50) DEFAULT NULL,
+  `email` text CHARACTER SET utf8,
+  `nazwa_pola` varchar(45) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Zrzut danych tabeli `osoba`
+--
+
+INSERT INTO `osoba` (`imie`, `nazwisko`, `urodzenie`, `telefon`, `email`, `nazwa_pola`) VALUES
+('ustaw', 'kurwa', NULL, NULL, 'sie@gmail.com', 'jo'),
+('żyd', NULL, NULL, NULL, NULL, 'kurwa'),
+('Tadeusz', 'Kosciuszko', '1745-12-01 00:00:00', '555 555 555', 'tadeusz.niezyd.k@td.ok', 'gruby'),
+(NULL, NULL, NULL, NULL, NULL, 'ok'),
+('Grzesiek', 'Pal', '1997-07-05 00:00:00', '123 455 123', NULL, 'panda'),
+('jakis', 'dziwny', NULL, NULL, 'sheet@gmail.com', 'moja nazwa'),
+('Tadeusz', 'Dabrowski', '2000-12-03 00:00:00', '+48 997 997 997', 'ten.numer.to@klopoty.xd', 'siwy'),
+('Arkadiusz', 'F', '1984-07-05 00:00:00', '012 654 722 731', NULL, 'neymar'),
+('Dominika', 'Grzeszczak', '1998-04-05 00:00:00', '+48 123 123 123', NULL, 'patelnia'),
+('Krzysztof', 'Skoczylas', '1987-03-15 00:00:00', '+38 123-128-192', NULL, 'gruby junior'),
+('Aleksander', 'Jesu', '1974-12-05 00:00:00', NULL, 'email.suchego@plexi.sh', 'suchy'),
+('Gniewko', 'Skoczylas', '1899-12-04 00:00:00', NULL, NULL, 'gruby senior'),
+('Mateusz', 'Grodny', '1969-04-23 00:00:00', '+48 123 980 173', 'langusta.752@onet.pl', 'dzikus'),
+('Lavente', 'Leukati', '1987-12-07 00:00:00', '123 453 123', 'hiszpanski.mail@hiszpania.hs', 'czysty'),
+('Michal', 'Nowy', '1979-01-04 00:00:00', '723 111 222', NULL, 'kusy'),
+('Michal', 'Kajto', '1954-07-12 00:00:00', '123 123 123', 'kajtek.m@polski.em', 'swierzak'),
+('moja', 'mama', NULL, '123 123 123', 'sobie.mama@gmail.com', 'mama'),
+('Charlie', 'P', '1999-12-09 00:00:00', '909 723 123', 'charlie.nyg0@p.fr', 'tata');
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla tabeli `uzyte_pola`
+--
+
+CREATE TABLE `uzyte_pola` (
+  `sciana_nazwa` varchar(45) NOT NULL,
+  `pole_x` int(3) NOT NULL,
+  `utworzenie` datetime DEFAULT NULL,
+  `pole_y` int(3) NOT NULL,
+  `nazwa_pola` varchar(45) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Zrzut danych tabeli `uzyte_pola`
+--
+
+INSERT INTO `uzyte_pola` (`sciana_nazwa`, `pole_x`, `utworzenie`, `pole_y`, `nazwa_pola`) VALUES
+('front', 0, '2018-01-12 13:59:44', 0, 'panda'),
+('right', 1, '2018-01-12 13:56:42', 1, 'gruby'),
+('front', 1, '2018-01-10 09:17:08', 1, 'siwy'),
+('bottom', 0, '2018-01-12 14:02:51', 1, 'neymar'),
+('bottom', 2, '2018-01-12 14:04:26', 2, 'patelnia'),
+('back', 0, '2018-01-12 14:07:51', 2, 'gruby junior'),
+('back', 1, '2018-01-12 14:08:48', 1, 'suchy'),
+('back', 2, '2018-01-12 14:12:21', 0, 'gruby senior'),
+('top', 1, '2018-01-12 14:14:30', 1, 'dzikus'),
+('top', 0, '2018-01-12 14:15:46', 0, 'czysty'),
+('top', 2, '2018-01-12 14:17:22', 1, 'kusy'),
+('front', 2, '2018-01-12 14:18:34', 1, 'swierzak'),
+('left', 0, '2018-01-12 14:20:57', 0, 'mama'),
+('left', 1, '2018-01-12 14:21:22', 0, 'tata'),
+('bottom', 2, '2018-01-17 11:06:54', 1, 'jakisziomek');
+
+--
+-- Indeksy dla zrzutów tabel
+--
+
+--
+-- Indexes for table `kostka`
+--
+ALTER TABLE `kostka`
+  ADD PRIMARY KEY (`sciana_nazwa`);
+
+--
+-- Indexes for table `osoba`
+--
+ALTER TABLE `osoba`
+  ADD PRIMARY KEY (`nazwa_pola`);
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
